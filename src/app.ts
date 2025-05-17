@@ -13,6 +13,8 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
+const MAX_RETRIES = 3;
+let retries = 0;
 
 // Middlewares
 app.use(cors());
@@ -33,7 +35,7 @@ app.use('/api/posts', postsRouter);
 app.use('/api/users', userRouter);
 
 // 404 Not Found
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: `Cannot ${req.method} ${req.url}`
@@ -43,27 +45,35 @@ app.use((req, res, next) => {
 // Error handler
 app.use(errorHandler);
 
-// Inicializar la base de datos y el servidor
-async function bootstrap() {
+// Inicializar la base de datos y el servidor con reintentos
+const connectWithRetry = async () => {
   try {
     if (!dataSource.isInitialized) {
       await dataSource.initialize();
       console.log('Conexión exitosa a la base de datos');
-      
+
       if (process.env.NODE_ENV !== 'production') {
         await seedDatabase();
       }
     }
-    
+
     app.listen(PORT, () => {
       console.log(`Servidor ejecutándose en el puerto ${PORT}`);
     });
-  } catch (error) {
-    console.error('Error al conectar a la base de datos:', error);
-    process.exit(1);
-  }
-}
+  } catch (error: unknown) {
+    const err = error as Error;
 
-bootstrap();
+    retries++;
+    if (retries > MAX_RETRIES) {
+      console.error('No se pudo conectar a la base de datos después de varios intentos.');
+      console.error('Detalle del error:', err.message);
+      process.exit(1);
+    }
+    console.warn(`Reintentando conexión a la base de datos (${retries}/${MAX_RETRIES})...`);
+    setTimeout(connectWithRetry, 5000);
+  }
+};
+
+connectWithRetry();
 
 export default app;
