@@ -39,7 +39,8 @@ const options: swaggerJsdoc.Options = {
     './src/**/*.router.ts', 
     './src/**/*.controller.ts', 
     './src/**/*.entity.ts',
-    './src/**/**.service.ts'
+    './src/**/*.service.ts',
+    './src/**/*.schema.ts' // Asegúrate de incluir los archivos de esquemas
   ],
 };
 

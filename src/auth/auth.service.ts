@@ -21,7 +21,7 @@ export class AuthService {
     try {
       const userRepo = getRepository(User);
       
-      // Verificar si el usuario ya existe - mejor manejo de búsqueda
+      // Verificar si el usuario ya existe
       const existingEmail = await userRepo.findOneBy({ email: userData.email });
       const existingUsername = await userRepo.findOneBy({ username: userData.username });
       
@@ -39,7 +39,8 @@ export class AuthService {
         ...userData,
         password: hashedPassword,
         bio: '',
-        profilePicture: ''
+        profilePicture: '',
+        fullName: userData.fullName ?? ''
       });
 
       const user = await userRepo.save(newUser);
@@ -54,7 +55,6 @@ export class AuthService {
         token
       };
     } catch (error) {
-      // Agregar mejor manejo de errores
       if (error instanceof ApiError) {
         throw error;
       }
@@ -83,7 +83,6 @@ export class AuthService {
         token
       };
     } catch (error) {
-      // Agregar mejor manejo de errores
       if (error instanceof ApiError) {
         throw error;
       }

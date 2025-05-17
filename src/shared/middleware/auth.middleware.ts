@@ -2,11 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { ApiError } from '../errors/api-error';
 
-// Extend Express Request to include user property
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
+      user: {
+        id: string;
+        username?: string;
+        email?: string;
+      };
     }
   }
 }
@@ -26,8 +29,8 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     }
     
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecretkey123456789');
-      req.user = decoded;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET ?? 'supersecretkey123456789');
+      req.user = decoded as { id: string; username?: string; email?: string };
       next();
     } catch (error) {
       if (error && typeof error === 'object' && 'name' in error) {
