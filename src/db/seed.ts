@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import dataSource from '../../ormconfig';
+import dataSource from '../data-source';
 import { User } from '../user/user.entity';
 import { Post } from '../posts/post.entity';
 
@@ -21,7 +21,7 @@ export const seedDatabase = async () => {
       return;
     }
     
-    console.log('Carga de datos inicializada.');
+    console.log('Comenzando la carga de datos de prueba...');
     
     // Creación de usuarios de prueba
     const testUsers = [
@@ -54,6 +54,8 @@ export const seedDatabase = async () => {
     const users = userRepository.create(testUsers);
     const savedUsers = await userRepository.save(users);
     
+    console.log(`Creados ${savedUsers.length} usuarios de prueba`);
+    
     // Crear Posts de prueba
     const posts = [
       {
@@ -82,8 +84,10 @@ export const seedDatabase = async () => {
     const createdPosts = postRepository.create(posts);
     await postRepository.save(createdPosts);
     
+    console.log(`Creados ${createdPosts.length} posts de prueba`);
     console.log('Base de datos inicializada con datos de prueba.');
   } catch (error) {
     console.error('Error al enviar datos a la base de datos:', error);
+    throw error;
   }
 };

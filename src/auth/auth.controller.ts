@@ -1,15 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import dataSource from '../../ormconfig';
-import { User } from '../user/user.entity';
+import { AuthService } from './auth.service';
 import { ApiError } from '../shared/errors/api-error';
-import { generateToken } from '../shared/utils/jwt.util';
-
-const getUserRepository = () => {
-  if (!dataSource.isInitialized) throw new Error('Base de datos no inicializada');
-  return dataSource.getRepository(User);
-};
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -23,27 +15,17 @@ const registerSchema = z.object({
   fullName: z.string().min(3)
 });
 
+const authService = new AuthService();
+
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password } = loginSchema.parse(req.body);
-    const userRepo = getUserRepository();
-
-    const user = await userRepo.findOneBy({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new ApiError('Email o contraseña inválidos', 401);
-    }
-
-    const token = generateToken(user);
-
+    const credentials = loginSchema.parse(req.body);
+    const result = await authService.login(credentials);
+    
     res.status(200).json({
       success: true,
       message: 'Login exitoso',
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email
-      }
+      ...result
     });
   } catch (error) {
     next(error);
@@ -60,43 +42,12 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
         validationError instanceof z.ZodError ? validationError.errors : []));
     }
     
-    const { username, email, password, fullName } = req.body;
-    const userRepo = getUserRepository();
-
-    // Verificar si el email o username ya existen (búsqueda optimizada)
-    const existingUser = await userRepo.findOne({
-      where: [{ email }, { username }],
-      select: ['id', 'email', 'username']
-    });
+    const result = await authService.register(req.body);
     
-    if (existingUser) {
-      const field = existingUser.email === email ? 'email' : 'nombre de usuario';
-      throw new ApiError(`El ${field} ya está registrado`, 409);
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = userRepo.create({
-      username,
-      email,
-      password: hashedPassword,
-      fullName,
-      bio: '',
-      profilePicture: ''
-    });
-
-    const user = await userRepo.save(newUser);
-    
-    const token = generateToken(user);
-
     res.status(201).json({
       success: true,
       message: 'Usuario registrado con éxito',
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email
-      }
+      ...result
     });
   } catch (error) {
     next(error);

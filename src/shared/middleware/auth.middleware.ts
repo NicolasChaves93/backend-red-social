@@ -30,10 +30,12 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
       req.user = decoded;
       next();
     } catch (error) {
-      if (error.name === 'JsonWebTokenError') {
-        throw new ApiError('Invalid token', 401);
-      } else if (error.name === 'TokenExpiredError') {
-        throw new ApiError('Token expired', 401);
+      if (error && typeof error === 'object' && 'name' in error) {
+        if ((error as { name: string }).name === 'JsonWebTokenError') {
+          throw new ApiError('Invalid token', 401);
+        } else if ((error as { name: string }).name === 'TokenExpiredError') {
+          throw new ApiError('Token expired', 401);
+        }
       }
       throw error;
     }

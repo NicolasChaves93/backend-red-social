@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import dataSource from '../ormconfig';
+import dataSource from './data-source';
 import { authRouter } from './auth/auth.router';
 import { postsRouter } from './posts/posts.router';
 import { userRouter } from './user/user.router';
@@ -22,7 +22,8 @@ app.use(express.json());
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
-    database: dataSource.isInitialized ? 'connected' : 'disconnected'
+    database: dataSource.isInitialized ? 'connected' : 'disconnected',
+    environment: process.env.NODE_ENV ?? 'development'
   });
 });
 
@@ -47,7 +48,7 @@ async function bootstrap() {
   try {
     if (!dataSource.isInitialized) {
       await dataSource.initialize();
-      console.log('Conexion exitosa a la base de datos');
+      console.log('Conexión exitosa a la base de datos');
       
       if (process.env.NODE_ENV !== 'production') {
         await seedDatabase();
@@ -55,10 +56,10 @@ async function bootstrap() {
     }
     
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Servidor ejecutándose en el puerto ${PORT}`);
     });
   } catch (error) {
-    console.error('No se pudo realizar conexion a la base de datos:', error);
+    console.error('Error al conectar a la base de datos:', error);
     process.exit(1);
   }
 }
