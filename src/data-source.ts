@@ -14,7 +14,7 @@ const dataSource = new DataSource({
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'social_network',
   synchronize: process.env.NODE_ENV !== 'production',
-  logging: process.env.NODE_ENV === 'development',
+  logging: ["error"],
   entities: [path.join(__dirname, '**/*.entity.{ts,js}')],
   migrations: [path.join(__dirname, 'db/migrations/**/*.{ts,js}')],
   subscribers: [path.join(__dirname, 'db/subscribers/**/*.{ts,js}')]
