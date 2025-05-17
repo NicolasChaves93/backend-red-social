@@ -1,5 +1,7 @@
-import express from 'express';
+import express, { Application } from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './config/swagger.config';
 import dotenv from 'dotenv';
 import dataSource from './data-source';
 import { authRouter } from './auth/auth.router';
@@ -11,7 +13,8 @@ import { errorHandler } from './shared/middleware/error.middleware';
 // Cargar variables de entorno
 dotenv.config();
 
-const app = express();
+// Inicializa la aplicación Express
+const app: Application = express();
 const PORT = process.env.PORT ?? 3000;
 const MAX_RETRIES = 3;
 let retries = 0;
@@ -19,6 +22,14 @@ let retries = 0;
 // Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Rutas de documentación Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -59,6 +70,7 @@ const connectWithRetry = async () => {
 
     app.listen(PORT, () => {
       console.log(`Servidor ejecutándose en el puerto ${PORT}`);
+      console.log(`Documentación de la API disponible en http://localhost:${PORT}/api-docs`);
     });
   } catch (error: unknown) {
     const err = error as Error;
