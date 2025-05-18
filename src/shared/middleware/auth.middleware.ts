@@ -31,7 +31,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
           id: decoded.id as string,
           email: decoded.email as string,
           username: decoded.username as string | undefined
-        };
+        } as any;
         next();
       } else {
         throw new ApiError('Invalid token payload structure', 401);

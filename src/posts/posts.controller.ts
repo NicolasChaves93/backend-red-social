@@ -36,11 +36,13 @@ const postsService = new PostsService();
  */
 export const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) {
+    const user = (req as any).user;
+
+    if (!user) {
       throw new ApiError('Usuario no autenticado', 401);
     }
 
-    const posts = await postsService.getAllPosts(req.user.id);
+    const posts = await postsService.getAllPosts(user.id);
     
     res.status(200).json({
       success: true,
@@ -91,12 +93,14 @@ export const getPosts = async (req: Request, res: Response, next: NextFunction) 
  */
 export const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) {
+    const user = (req as any).user;
+
+    if (!user) {
       throw new ApiError('Usuario no autenticado', 401);
     }
 
     const postData: CreatePostInput = req.body;
-    const post = await postsService.createPost(req.user.id, postData);
+    const post = await postsService.createPost(user.id, postData);
     
     res.status(201).json({
       success: true,
@@ -151,12 +155,14 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
  */
 export const likePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) {
+    const user = (req as any).user;
+
+    if (!user) {
       throw new ApiError('Usuario no autenticado', 401);
     }
 
     const { id } = req.params;
-    const result = await postsService.toggleLike(id, req.user.id);
+    const result = await postsService.toggleLike(id, user.id);
     
     res.status(200).json({
       success: true,
