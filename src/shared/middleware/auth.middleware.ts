@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { ApiError } from '../errors/api-error';
+import { AuthRequest } from '../interfaces/request.interface';
 
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
     
@@ -49,4 +50,18 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   } catch (error) {
     next(error);
   }
+};
+
+export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
+  // Your authentication logic
+  // ...
+  
+  // When setting the user, TypeScript will now recognize it
+  req.user = {
+    id: 'user-id',
+    email: 'user@example.com',
+    // other properties
+  };
+  
+  next();
 };

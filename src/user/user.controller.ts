@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { UserService } from './user.service';
 import { UpdateProfileInput } from './user.schema';
 import { ApiError } from '../shared/errors/api-error';
+import { AuthRequest } from '../shared/interfaces/request.interface';
 
 const userService = new UserService();
 
@@ -32,7 +33,7 @@ const userService = new UserService();
  *       500:
  *         description: Error interno del servidor
  */
-export const getProfile = async (req: Request, res: Response, next: NextFunction) => {
+export const getProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     // Verificar si el usuario está autenticado
     if (!req.user) {
@@ -40,7 +41,6 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
     }
     
     const userId = req.user.id;
-    const userEmail = req.user.email;
     
     const profile = await userService.getUserProfile(userId, userId);
     res.status(200).json({ success: true, data: profile });
@@ -85,7 +85,7 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
  *       500:
  *         description: Error interno del servidor
  */
-export const getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
+export const getUserProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     // Verificar si el usuario está autenticado
     if (!req.user) {
@@ -138,7 +138,7 @@ export const getUserProfile = async (req: Request, res: Response, next: NextFunc
  *       500:
  *         description: Error interno del servidor
  */
-export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+export const updateProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     // Verificar si el usuario está autenticado
     if (!req.user) {
