@@ -146,7 +146,7 @@ http://localhost:3000/api/docs
 
 1. Clona el repositorio:
    ```
-   git clone https://github.com/tu-usuario/backend-red-social.git
+   git clone https://github.com/NicolasChaves93/backend-red-social.git
    cd backend-red-social
    ```
 
@@ -177,9 +177,11 @@ http://localhost:3000/api/docs
 
 Después de ejecutar el seeder, puedes usar estas cuentas de prueba:
 
-- Usuario: john_doe, Email: john@example.com, Contraseña: password123
-- Usuario: jane_smith, Email: jane@example.com, Contraseña: password123
-- Usuario: alex_wilson, Email: alex@example.com, Contraseña: password123
+- Username: CarlosGomez, Email: carlos.gomez@example.com, Password: password123
+  
+- Username: TaniaMercedes, Email: tania.mercedes@example.com, Password: password123
+  
+- Username: AlexRemolina, Email: aleander.remolina@example.com, Password: password123
 
 ---
 
