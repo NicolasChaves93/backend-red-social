@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from './user.service';
 import { UpdateProfileInput } from './user.schema';
+import { ApiError } from '../shared/errors/api-error';
 
 const userService = new UserService();
 
@@ -33,7 +34,15 @@ const userService = new UserService();
  */
 export const getProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const profile = await userService.getUserProfile(req.user.id, req.user.id);
+    // Verificar si el usuario está autenticado
+    if (!req.user) {
+      throw new ApiError('Usuario no autenticado', 401);
+    }
+    
+    const userId = req.user.id;
+    const userEmail = req.user.email;
+    
+    const profile = await userService.getUserProfile(userId, userId);
     res.status(200).json({ success: true, data: profile });
   } catch (error) {
     next(error);
@@ -78,6 +87,11 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
  */
 export const getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // Verificar si el usuario está autenticado
+    if (!req.user) {
+      throw new ApiError('Usuario no autenticado', 401);
+    }
+    
     const { id } = req.params;
     const profile = await userService.getUserProfile(id, req.user.id);
     res.status(200).json({ success: true, data: profile });
@@ -126,8 +140,14 @@ export const getUserProfile = async (req: Request, res: Response, next: NextFunc
  */
 export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // Verificar si el usuario está autenticado
+    if (!req.user) {
+      throw new ApiError('Usuario no autenticado', 401);
+    }
+    
+    const userId = req.user.id;
     const updateData: UpdateProfileInput = req.body;
-    const profile = await userService.updateProfile(req.user.id, updateData);
+    const profile = await userService.updateProfile(userId, updateData);
     
     res.status(200).json({
       success: true,

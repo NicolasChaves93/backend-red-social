@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { PostsService } from './posts.service';
 import { CreatePostInput } from './posts.schema';
+import { ApiError } from '../shared/errors/api-error';
 
 const postsService = new PostsService();
 
@@ -35,6 +36,10 @@ const postsService = new PostsService();
  */
 export const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    if (!req.user) {
+      throw new ApiError('Usuario no autenticado', 401);
+    }
+
     const posts = await postsService.getAllPosts(req.user.id);
     
     res.status(200).json({
@@ -86,6 +91,10 @@ export const getPosts = async (req: Request, res: Response, next: NextFunction) 
  */
 export const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    if (!req.user) {
+      throw new ApiError('Usuario no autenticado', 401);
+    }
+
     const postData: CreatePostInput = req.body;
     const post = await postsService.createPost(req.user.id, postData);
     
@@ -142,6 +151,10 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
  */
 export const likePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    if (!req.user) {
+      throw new ApiError('Usuario no autenticado', 401);
+    }
+
     const { id } = req.params;
     const result = await postsService.toggleLike(id, req.user.id);
     

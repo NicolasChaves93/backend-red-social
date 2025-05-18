@@ -2,18 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { ApiError } from '../errors/api-error';
 
-declare global {
-  namespace Express {
-    interface Request {
-      user: {
-        id: string;
-        username?: string;
-        email?: string;
-      };
-    }
-  }
-}
-
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
@@ -30,8 +18,24 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET ?? 'supersecretkey123456789');
-      req.user = decoded as { id: string; username?: string; email?: string };
-      next();
+      
+      // Asegurarnos de que el objeto decoded tenga las propiedades requeridas
+      if (typeof decoded === 'object' && decoded !== null && 'id' in decoded) {
+        // Verificar que email esté definido, si se requiere como no opcional
+        if (!decoded.email) {
+          throw new ApiError('Invalid token payload', 401);
+        }
+        
+        // Asignar explícitamente las propiedades necesarias
+        req.user = {
+          id: decoded.id as string,
+          email: decoded.email as string,
+          username: decoded.username as string | undefined
+        };
+        next();
+      } else {
+        throw new ApiError('Invalid token payload structure', 401);
+      }
     } catch (error) {
       if (error && typeof error === 'object' && 'name' in error) {
         if ((error as { name: string }).name === 'JsonWebTokenError') {
