@@ -1,110 +1,229 @@
-# Social Network API with Microservices Architecture
+# Red Social API – Arquitectura de Microservicios
 
-This project is a RESTful API for a social networking application built with a microservices architecture, using Node.js, Express, TypeORM, and PostgreSQL.
+Este proyecto implementa una API RESTful robusta para una aplicación de red social, construida con arquitectura de microservicios utilizando **Node.js**, **Express**, **TypeORM** y **PostgreSQL**. El backend está diseñado para ser escalable, modular y seguir buenas prácticas de desarrollo moderno.
 
-## Features
+---
 
-- User authentication with JWT
-- User profiles
-- Creating posts
-- Liking posts
-- Post feed
-- Database seeding with test data
+## 🚀 Funcionalidades principales
 
-## Project Structure
+- Autenticación de usuarios (registro e inicio de sesión con JWT)
+- Gestión de perfiles de usuario
+- Creación y visualización de publicaciones
+- Like/Unlike a publicaciones
+- Feed de publicaciones
+- Seeder de base de datos con datos de prueba
+- Manejo de errores estructurado y validación con `zod`
+
+---
+
+## 🗂️ Estructura del proyecto
 
 ```
-backend/
-│
+backend-red-social/
 ├── src/
-│   ├── auth/              # Authentication service
-│   ├── posts/             # Posts service
-│   ├── user/              # User profile service
-│   ├── db/                # Database configuration and seeders
-│   ├── shared/            # Shared utilities, middlewares, and error handlers
-│   └── app.ts             # Main application entry point
+│   ├── __tests__/                      # Carpeta de pruebas (vacía o para test unitarios)
 │
-├── Dockerfile
-├── docker-compose.yml
-├── ormconfig.ts          # TypeORM configuration
-└── tsconfig.json
+│   ├── auth/                           # Módulo de autenticación
+│   │   ├── auth.controller.ts          # Controlador de autenticación
+│   │   ├── auth.router.ts              # Definición de rutas de auth
+│   │   ├── auth.schema.ts              # Validaciones con Zod
+│   │   └── auth.service.ts             # Lógica de negocio (login, registro)
+│
+│   ├── config/
+│   │   └── swagger.config.ts           # Configuración para la documentación Swagger
+│
+│   ├── db/
+│   │   └── seed.ts                     # Seeder de base de datos
+│
+│   ├── posts/                          # Módulo de publicaciones
+│   │   ├── post.entity.ts              # Entidad de publicación (Post)
+│   │   ├── posts.controller.ts         # Controlador de publicaciones
+│   │   ├── posts.router.ts             # Rutas de publicaciones
+│   │   ├── posts.schema.ts             # Validaciones de publicación
+│   │   └── posts.service.ts            # Lógica de negocio de publicaciones
+│
+│   ├── shared/                         # Código reutilizable global
+│   │   ├── errors/
+│   │   │   └── api-error.ts            # Clase de error personalizada
+│   │   ├── middleware/
+│   │   │   ├── auth.middleware.ts      # Middleware JWT
+│   │   │   ├── error.middleware.ts     # Manejo de errores globales
+│   │   │   └── validation.middleware.ts# Validación con Zod
+│   │   ├── types/
+│   │   │   └── express.d.ts            # Tipos extendidos de Express
+│   │   └── utils/
+│   │       ├── jwt.util.ts             # Utilidades para generar/verificar JWT
+│   │       └── repository.util.ts      # Wrapper para consultas con TypeORM
+│
+│   ├── types/
+│   │   ├── express/
+│   │   │   └── index.d.ts              # Tipos para req.user, etc.
+│   │   └── express.d.ts
+│
+│   ├── user/                           # Módulo de perfil de usuario
+│   │   ├── user.controller.ts          # Controlador de perfil
+│   │   ├── user.entity.ts              # Entidad User
+│   │   ├── user.router.ts              # Rutas de perfil
+│   │   ├── user.schema.ts              # Validaciones del perfil
+│   │   └── user.service.ts             # Lógica del perfil
+│
+│   ├── app.ts                          # Punto de entrada de la aplicación
+│   └── data-source.ts                  # Conexión y configuración de TypeORM
+├── Dockerfile                          # Imagen del backend
+├── docker-compose.yml                  # Orquestación de servicios
+├── ormconfig.ts                        # Configuración TypeORM
+├── .env                                # Variables de entorno
 ```
 
-## Getting Started
+---
 
-### Prerequisites
+## 📦 Tecnologías utilizadas
 
-- Node.js (v14+)
-- PostgreSQL or Docker
+- **Node.js** + **Express**
+- **TypeORM** + **PostgreSQL**
+- **JWT** para autenticación
+- **Zod** para validaciones
+- **Swagger** para documentación (`/api/docs`)
+- **Winston** para logs
+- **TypeScript** (estrict mode)
 
-### Installation
+---
 
-1. Clone the repository:
+## 🛠️ Scripts útiles
+
+| Comando           | Descripción                                  |
+|-------------------|----------------------------------------------|
+| `npm run dev`     | Inicia el servidor en modo desarrollo        |
+| `npm run build`   | Transpila a JavaScript en `dist/`            |
+| `npm start`       | Ejecuta el servidor desde `dist/`            |
+| `npm run seed`    | Ejecuta el seeder de datos                   |
+| `npm run test`    | Corre pruebas con Jest                       |
+| `npm run lint`    | Ejecuta ESLint sobre los archivos del código |
+
+---
+
+## 🐳 Docker
+
+```bash
+docker-compose up --build
+```
+
+Levanta la base de datos PostgreSQL y el backend
+
+Asegúrate de configurar correctamente tu archivo `.env`
+
+---
+
+## 📄 Documentación de la API
+
+Documentación Swagger disponible en:
+http://localhost:3000/api/docs
+
+---
+
+## Estado del proyecto
+
+✅ Autenticación JWT  
+✅ CRUD de publicaciones  
+✅ Likes a publicaciones  
+✅ Gestión de perfiles  
+✅ Seeder inicial  
+✅ Documentación Swagger
+
+---
+
+## Requisitos para desarrollo
+
+- Node.js >= 18.x
+- PostgreSQL >= 14
+- Docker (opcional)
+
+---
+
+## 🚀 Primeros pasos
+
+### Instalación
+
+1. Clona el repositorio:
    ```
-   git clone https://github.com/yourusername/social-network-api.git
-   cd social-network-api
+   git clone https://github.com/NicolasChaves93/backend-red-social.git
+   cd backend-red-social
    ```
 
-2. Install dependencies:
+2. Instala las dependencias:
    ```
    npm install
    ```
 
-3. Create a `.env` file in the root directory with the following content:
+3. Crea un archivo `.env` en el directorio raíz con el siguiente contenido:
    ```
    PORT=3000
    NODE_ENV=development
-   JWT_SECRET=yoursecretkey
+   JWT_SECRET=tu_clave_secreta
    JWT_EXPIRES_IN=1d
    DB_HOST=localhost
    DB_PORT=5432
    DB_USERNAME=postgres
-   DB_PASSWORD=postgres
-   DB_NAME=social_network
+   DB_PASSWORD=tu_contraseña
+   DB_NAME=red_social_db
    ```
 
-4. Start the application:
+4. Inicia la aplicación:
    ```
    npm run dev
    ```
-   
-   This will automatically create database tables and seed them with test data.
 
-### Using Docker
+### Usuarios de prueba
 
-To run the application with Docker:
+Después de ejecutar el seeder, puedes usar estas cuentas de prueba:
 
-```
-docker-compose up
-```
+- Username: CarlosGomez, Email: carlos.gomez@example.com, Password: password123
+  
+- Username: TaniaMercedes, Email: tania.mercedes@example.com, Password: password123
+  
+- Username: AlexRemolina, Email: aleander.remolina@example.com, Password: password123
 
-## API Endpoints
+---
 
-### Authentication
+## 📝 API Endpoints
 
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login and get JWT token
+### Autenticación
 
-### Posts
+- `POST /api/auth/register` - Registrar nuevo usuario
+- `POST /api/auth/login` - Iniciar sesión y obtener token JWT
 
-- `GET /api/posts` - Get all posts
-- `POST /api/posts` - Create a new post
-- `POST /api/posts/:id/like` - Like/unlike a post
+### Publicaciones
 
-### Users
+- `GET /api/posts` - Obtener todas las publicaciones
+- `POST /api/posts` - Crear una nueva publicación
+- `POST /api/posts/:id/like` - Dar/quitar like a una publicación
 
-- `GET /api/users/profile` - Get current user profile
-- `GET /api/users/:id` - Get a user's profile
-- `PUT /api/users/profile` - Update current user profile
+### Usuarios
 
-## Test Users
+- `GET /api/users/profile` - Obtener perfil del usuario actual
+- `GET /api/users/:id` - Obtener perfil de un usuario
+- `PUT /api/users/profile` - Actualizar perfil del usuario actual
 
-After seeding, you can use these test accounts:
+---
 
-- Username: john_doe, Email: john@example.com, Password: password123
-- Username: jane_smith, Email: jane@example.com, Password: password123
-- Username: alex_wilson, Email: alex@example.com, Password: password123
+## 👥 Contribución
 
-## License
+1. Haz fork del repositorio
+2. Crea tu rama de funcionalidad (`git checkout -b feature/nueva-funcionalidad`)
+3. Haz commit de tus cambios (`git commit -m 'Añadir nueva funcionalidad'`)
+4. Haz push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
+
+## 📄 Licencia
+
+Este proyecto está licenciado bajo la Licencia MIT - ver el archivo LICENSE para más detalles.
+
+---
+
+## 🙏 Agradecimientos
+
+- Al equipo de Express.js por el increíble framework
+- A los contribuidores de TypeORM por el excelente ORM
+- A todos los contribuidores de código abierto cuyas librerías hicieron posible este proyecto
